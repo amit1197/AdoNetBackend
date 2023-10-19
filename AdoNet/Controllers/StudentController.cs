@@ -243,6 +243,7 @@ namespace AdoNet.Controllers
             finally { connString.Close(); }
         }
 
+        /*
 
         [HttpPatch]
         [Route("UpdateStudent/{id}")]
@@ -268,6 +269,91 @@ namespace AdoNet.Controllers
                 SqlCommand cmd = new SqlCommand(query, connString);
                 cmd.Parameters.AddWithValue("@NewValue", newValue);
                 cmd.Parameters.AddWithValue("@StudentID", id);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    return Ok("Student updated successfully.");
+                }
+                else
+                {
+                    return NotFound("Student not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+            finally
+            {
+                connString.Close();
+            }
+        }
+
+        */
+
+
+        [HttpPut]
+        [Route("UpdateStudent/{id}")]
+        public async Task<IActionResult> UpdateStudent(string id, [FromBody] Student updatedStudent)
+        {
+            if (updatedStudent == null || string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest("Invalid data or ID.");
+            }
+
+            connString = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            try
+            {
+                connString.Open();
+
+                // Use a parameterized query to update the student's record
+                string query = "UPDATE StudentOriginal SET " +
+                    "Student_ID = @StudentID, " +
+                    "Gender = @Gender, " +
+                    "Nationality = @Nationality, " +
+                    "PlaceOfBirth = @PlaceOfBirth, " +
+                    "StageID = @StageID, " +
+                    "GradeID = @GradeID, " +
+                    "SectionID = @SectionID, " +
+                    "Topic = @Topic, " +
+                    "Semester = @Semester, " +
+                    "Relation = @Relation, " +
+                    "RaisedHands = @RaisedHands, " +
+                    "VisitedResources = @VisitedResources, " +
+                    "AnnouncementsView = @AnnouncementsView, " +
+                    "Discussion = @Discussion, " +
+                    "ParentAnsweringSurvey = @ParentAnsweringSurvey, " +
+                    "ParentSchoolSatisfaction = @ParentSchoolSatisfaction, " +
+                    "StudentAbsenceDays = @StudentAbsenceDays, " +
+                    "Student_Marks = @StudentMarks, " +
+                    "Class = @Class " +
+                    "WHERE Student_ID = @StudentID";
+
+                SqlCommand cmd = new SqlCommand(query, connString);
+
+                // Set parameters for the update
+                cmd.Parameters.AddWithValue("@StudentID", id);
+                cmd.Parameters.AddWithValue("@Gender", updatedStudent.Gender);
+                cmd.Parameters.AddWithValue("@Nationality", updatedStudent.Nationality);
+                cmd.Parameters.AddWithValue("@PlaceOfBirth", updatedStudent.PlaceOfBirth);
+                cmd.Parameters.AddWithValue("@StageID", updatedStudent.StageID);
+                cmd.Parameters.AddWithValue("@GradeID", updatedStudent.GradeID);
+                cmd.Parameters.AddWithValue("@SectionID", updatedStudent.SectionID);
+                cmd.Parameters.AddWithValue("@Topic", updatedStudent.Topic);
+                cmd.Parameters.AddWithValue("@Semester", updatedStudent.Semester);
+                cmd.Parameters.AddWithValue("@Relation", updatedStudent.Relation);
+                cmd.Parameters.AddWithValue("@RaisedHands", updatedStudent.RaisedHands);
+                cmd.Parameters.AddWithValue("@VisitedResources", updatedStudent.VisitedResources);
+                cmd.Parameters.AddWithValue("@AnnouncementsView", updatedStudent.AnnouncementsView);
+                cmd.Parameters.AddWithValue("@Discussion", updatedStudent.Discussion);
+                cmd.Parameters.AddWithValue("@ParentAnsweringSurvey", updatedStudent.ParentAnsweringSurvey);
+                cmd.Parameters.AddWithValue("@ParentSchoolSatisfaction", updatedStudent.ParentSchoolSatisfaction);
+                cmd.Parameters.AddWithValue("@StudentAbsenceDays", updatedStudent.StudentAbsenceDays);
+                cmd.Parameters.AddWithValue("@StudentMarks", updatedStudent.StudentMarks);
+                cmd.Parameters.AddWithValue("@Class", updatedStudent.Class);
 
                 int rowsAffected = cmd.ExecuteNonQuery();
 
