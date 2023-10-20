@@ -3,38 +3,50 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System;
 using System.Data;
+using Microsoft.Extensions.Configuration;
 
 
-namespace AdoNet.Controllers
+namespace adonet.controllers
 {
-    //[Route("api/[databasetruncatorcontroller]")]
-    //[ApiController]
+    //[route("api/[databasetruncatorcontroller]")]
+    //[apicontroller]
     public class DatabaseTruncatorController : ControllerBase
     {
-        private readonly string connectionString;
-
-        public DatabaseTruncatorController(string connectionString)
+        private readonly IConfiguration _configuration;
+        public DatabaseTruncatorController(IConfiguration configuration)
         {
-            this.connectionString = connectionString;
+            _configuration = configuration;
         }
 
-        public void TruncateTable(string tableName)
+        [HttpDelete("database")]
+        public IActionResult TruncateDatabase()
         {
-            string query = "TRUNCATE TABLE " + tableName;
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                try
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+
+
+                using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Table '{0}' truncated successfully.", tableName);
+
+
+
+
+                    using (var command = new SqlCommand("TRUNCATE TABLE StudentOriginal", connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error: {0}", ex.Message);
-                }
+
+
+
+                return Ok("Database truncated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to truncate the database: {ex.Message}");
             }
         }
     }
