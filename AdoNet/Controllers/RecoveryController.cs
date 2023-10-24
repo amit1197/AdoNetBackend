@@ -18,7 +18,7 @@ namespace AdoNet.Controllers
         }
 
         [Route("Recovery")]
-        [HttpPost]
+        [HttpGet]
         public ActionResult Recovery()
         {
             SqlConnection connString;
